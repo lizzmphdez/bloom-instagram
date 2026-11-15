@@ -1,0 +1,236 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bloom ♡ | Mi Planificador</title>
+<style>
+:root{--pink:#d58ca3;--light:#fff2f5;--dark:#593b49;--line:#efdce3}
+*{box-sizing:border-box}
+body{margin:0;background:#fff9fa;color:var(--dark);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+header{background:linear-gradient(135deg,#f8dce5,#fff5f7);padding:30px 20px;border-radius:0 0 30px 30px}
+.wrap{max-width:650px;margin:auto;padding:0 16px 90px}
+h1{font-family:Georgia,serif;font-size:38px;margin:8px 0}
+h2{font-size:20px;margin:0 0 15px}
+p{line-height:1.55}
+.small{font-size:13px;color:#997886}
+.card{background:white;border:1px solid var(--line);border-radius:20px;padding:18px;margin:14px 0;box-shadow:0 3px 14px #e8c4d022}
+button{font:inherit;cursor:pointer}
+nav{display:flex;gap:8px;overflow-x:auto;padding:18px 0}
+nav button,.week button{border:1px solid var(--line);border-radius:24px;background:white;color:var(--dark);padding:11px 15px;white-space:nowrap}
+nav button.active,.week button.active,.primary{background:var(--pink);color:white;border-color:var(--pink)}
+.week{display:flex;gap:7px;overflow-x:auto;margin:15px 0}
+.week button{padding:9px 13px;font-size:13px}
+.task{display:flex;align-items:flex-start;gap:13px}
+.task input{width:23px;height:23px;accent-color:var(--pink);flex-shrink:0;margin-top:5px}
+.task h3{margin:6px 0;font-size:17px}
+.task p{margin:7px 0;font-size:14px;color:#806775}
+.tag{display:inline-block;background:var(--light);color:#ae7188;border-radius:20px;padding:5px 10px;font-size:12px}
+.progress{height:12px;background:#f3e4e9;border-radius:20px;overflow:hidden}
+.fill{height:100%;width:0;background:var(--pink);transition:width .3s}
+input[type=number],textarea{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px;font:inherit;background:#fff}
+label{display:block;margin:12px 0 6px;font-size:14px}
+.primary{border:0;border-radius:14px;padding:12px 18px}
+.hidden{display:none}
+footer{text-align:center;color:#b78d9b;font-size:12px;padding:25px}
+</style>
+</head>
+<body>
+<header>
+<div style="max-width:650px;margin:auto">
+<div class="small">YOUR SOCIAL PLANNER ♡</div>
+<h1>Bloom ♡</h1>
+<p>Hola, Lizz 🌷<br>Un día a la vez, hacia tus 10,000 seguidores.</p>
+</div>
+</header>
+
+<div class="wrap">
+<nav>
+<button class="active" onclick="tab('inicio',this)">♡ Inicio</button>
+<button onclick="tab('calendario',this)">Calendario</button>
+<button onclick="tab('estadisticas',this)">Estadísticas</button>
+<button onclick="tab('progreso',this)">Progreso</button>
+</nav>
+
+<section id="inicio">
+<div class="card">
+<h2>Mi meta de Instagram ✨</h2>
+<div class="small">Objetivo: 10,000 seguidores</div>
+<h1 id="followersHome">840</h1>
+<div class="small">Seguidores registrados</div>
+</div>
+<div class="card">
+<h2>Mi progreso 🌸</h2>
+<p id="progressText">0 de 30 tareas completadas</p>
+<div class="progress"><div class="fill" id="progressBar"></div></div>
+</div>
+<div class="card">
+<h2>Tu plan de hoy ♡</h2>
+<div id="today"></div>
+</div>
+</section>
+
+<section id="calendario" class="hidden">
+<div class="card">
+<h2>Calendario de contenido</h2>
+<p class="small">15 de noviembre al 14 de diciembre de 2026. Horarios de Miami.</p>
+<div class="week" id="weeks"></div>
+</div>
+<div id="tasks"></div>
+</section>
+
+<section id="estadisticas" class="hidden">
+<div class="card">
+<h2>Mis estadísticas 📊</h2>
+<label>Seguidores actuales</label>
+<input id="followers" type="number" min="0" value="840">
+<label>Visualizaciones del último Reel</label>
+<input id="views" type="number" min="0" value="0">
+<label>Likes del último Reel</label>
+<input id="likes" type="number" min="0" value="0">
+<label>Compartidos del último Reel</label>
+<input id="shares" type="number" min="0" value="0">
+<label>Notas y resultados</label>
+<textarea id="notes" rows="5" placeholder="¿Qué publicación funcionó mejor?"></textarea>
+<p><button class="primary" onclick="saveStats()">Guardar estadísticas ♡</button></p>
+<p id="saved" class="small"></p>
+</div>
+</section>
+
+<section id="progreso" class="hidden">
+<div class="card">
+<h2>Mi crecimiento 🌷</h2>
+<h1 id="percent">0%</h1>
+<p id="completed">0 tareas completadas</p>
+<div class="progress"><div class="fill" id="progressBar2"></div></div>
+<p class="small">Cada pequeño paso cuenta.</p>
+</div>
+<div class="card">
+<h2>Guardar un respaldo</h2>
+<p class="small">Descarga una copia de tus tareas y estadísticas para conservar tus avances.</p>
+<button class="primary" onclick="backup()">Exportar respaldo</button>
+</div>
+</section>
+<footer>Bloom ♡ · Planifica, crea y florece.</footer>
+</div>
+
+<script>
+const plan=[
+["15 nov.","7:30 p. m.","Reel","Reel de Louis Tomlinson","Tu Reel de Lemonade ya está programado. Cuando se publique, compártelo en Stories con: still not over this night 🥹🍋💙."],
+["16 nov.","6:00 p. m.","Stories","Revisar resultados + Stories","Revisa las primeras 24 horas del Reel: vistas, compartidos y seguidores nuevos. Publica una encuesta: Louis solo or One Direction?"],
+["17 nov.","7:00 p. m.","Reel","Recuerdos del crucero","Combina cinco clips del mar, el barco y atardeceres. Texto: wish i could go back to this moment 🌊."],
+["18 nov.","6:00 p. m.","Carrusel","Fotos tuyas","Publica entre cinco y siete fotos de un outfit o salida. Empieza con tu mejor foto. Caption: little moments lately ✨."],
+["19 nov.","7:00 p. m.","Comunidad","Interactuar con tu comunidad","Responde comentarios, participa en conversaciones de fans de Louis y comparte una canción favorita en Stories."],
+["20 nov.","6:30 p. m.","Reel","Otro momento del concierto","Utiliza un clip distinto del concierto. Texto: concert nights will always have my heart."],
+["21 nov.","11:00 a. m.","Stories","Fin de semana","Comparte dos o tres Stories de tu día: selfie, café, comida o algún lugar que visites. Añade una encuesta."],
+["22 nov.","6:00 p. m.","Análisis","Revisar estadísticas","Identifica qué Reel tuvo mayor alcance entre no seguidores y prepara una versión nueva de ese estilo."],
+["23 nov.","7:00 p. m.","Reel","Outfit del día","Graba dos o tres tomas de un look. Texto: a little outfit moment ✨."],
+["24 nov.","6:00 p. m.","Stories","Encuesta de fotos","Comparte dos fotos y pregunta: which one should i post?"],
+["25 nov.","6:30 p. m.","Carrusel","Photo dump","Publica entre seis y ocho fotos variadas: selfie, paisaje, comida, outfit y detalles. Caption: camera roll lately 🤍."],
+["26 nov.","7:00 p. m.","Reel","Recuerdos de Disney","Combina clips de Disney. Texto: never too old for a little magic ✨."],
+["27 nov.","6:00 p. m.","Comunidad","Responder e interactuar","Responde mensajes y comentarios. Comparte en Stories tu publicación favorita de la semana."],
+["28 nov.","11:00 a. m.","Reel","Montaje de vacaciones","Publica un video de 10 a 18 segundos con tus mejores momentos de viaje."],
+["29 nov.","6:00 p. m.","Análisis","Comparar crecimiento","Compara seguidores, visitas al perfil, alcance y compartidos con la semana anterior."],
+["30 nov.","7:00 p. m.","Reel","Recuerdos de noviembre","Combina cuatro o cinco clips de tus mejores momentos del mes. Texto: november, you were something special."],
+["1 dic.","6:30 p. m.","Stories","Historias musicales","Comparte tu canción favorita de Louis o One Direction y pregunta: what's your favorite?"],
+["2 dic.","6:00 p. m.","Carrusel","Fotos de outfit","Publica varias fotos de un mismo look, con diferentes encuadres y detalles."],
+["3 dic.","7:00 p. m.","Reel","Un recuerdo del crucero","Prueba un Reel diferente al anterior. Empieza con la mejor vista del océano y añade un texto breve."],
+["4 dic.","6:00 p. m.","Comunidad","Interacción auténtica","Responde comentarios y conversa con cuentas que compartan tus intereses, sin usar mensajes repetitivos."],
+["5 dic.","11:00 a. m.","Reel","Momentos del fin de semana","Graba tres o cuatro momentos de una salida o usa clips anteriores de restaurantes y actividades."],
+["6 dic.","6:00 p. m.","Análisis","Revisión semanal","Identifica las dos publicaciones que consiguieron más seguidores nuevos y alcance entre no seguidores."],
+["7 dic.","7:00 p. m.","Reel","Repetir tu mejor temática","Crea una nueva versión del tema ganador: Louis, viajes u outfits, utilizando clips distintos."],
+["8 dic.","6:00 p. m.","Stories","Historias personales","Publica una selfie y una encuesta sobre música, viajes o planes."],
+["9 dic.","6:30 p. m.","Carrusel","Photo dump de diciembre","Publica entre cinco y ocho fotos recientes. Abre con tu foto más llamativa."],
+["10 dic.","7:00 p. m.","Reel","Concierto o viaje","Elige el tema que más compartidos consiguió. Añade un texto que dé contexto desde el principio."],
+["11 dic.","6:00 p. m.","Comunidad","Stories e interacción","Comparte un recuerdo y responde comentarios pendientes. Observa qué preguntas interesan más."],
+["12 dic.","11:00 a. m.","Reel","Recuerdos favoritos del año","Haz un montaje de momentos bonitos del año. Puedes utilizar videos que ya tengas."],
+["13 dic.","6:00 p. m.","Análisis","Evaluación de 30 días","Registra seguidores actuales, alcance, guardados, compartidos y los formatos que mejor funcionaron."],
+["14 dic.","7:00 p. m.","Planificación","Preparar el próximo mes","Elige las tres temáticas que más seguidores trajeron y prepara el siguiente calendario."]
+];
+
+let done={};
+let stats={followers:840,views:0,likes:0,shares:0,notes:""};
+let week=0;
+
+try{done=JSON.parse(localStorage.getItem("bloomDone")||"{}");}catch(e){}
+try{stats={...stats,...JSON.parse(localStorage.getItem("bloomStats")||"{}")};}catch(e){}
+
+function tab(id,btn){
+document.querySelectorAll("section").forEach(s=>s.classList.add("hidden"));
+document.getElementById(id).classList.remove("hidden");
+document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+btn.classList.add("active");
+if(id==="calendario")render();
+if(id==="progreso")update();
+}
+
+function toggle(i,checked){
+done[i]=checked;
+localStorage.setItem("bloomDone",JSON.stringify(done));
+render();
+update();
+}
+
+function taskHTML(i){
+let p=plan[i];
+return `<div class="card"><div class="task">
+<input type="checkbox" ${done[i]?"checked":""} onchange="toggle(${i},this.checked)">
+<div style="flex:1">
+<div class="small">${p[0]} · ${p[1]}</div>
+<h3>${p[3]}</h3>
+<span class="tag">${p[2]}</span>
+<p>${p[4]}</p>
+</div></div></div>`;
+}
+
+function render(){
+document.getElementById("weeks").innerHTML=
+Array.from({length:5},(_,i)=>
+`<button class="${week===i?"active":""}" onclick="week=${i};render()">Semana ${i+1}</button>`).join("");
+let start=week*7,end=Math.min(start+7,30);
+document.getElementById("tasks").innerHTML=
+plan.slice(start,end).map((p,i)=>taskHTML(start+i)).join("");
+}
+
+function update(){
+let count=Object.values(done).filter(Boolean).length;
+let pct=Math.round(count/30*100);
+document.getElementById("progressText").textContent=count+" de 30 tareas completadas";
+document.getElementById("completed").textContent=count+" de 30 tareas completadas";
+document.getElementById("percent").textContent=pct+"%";
+document.getElementById("progressBar").style.width=pct+"%";
+document.getElementById("progressBar2").style.width=pct+"%";
+document.getElementById("followersHome").textContent=stats.followers;
+let todayIndex=Math.floor((new Date().setHours(12,0,0,0)-new Date(2026,10,15,12).getTime())/86400000);
+document.getElementById("today").innerHTML=
+todayIndex>=0&&todayIndex<30?taskHTML(todayIndex):
+"<p>Abre el calendario para revisar tu plan de 30 días. ♡</p>";
+}
+
+function saveStats(){
+["followers","views","likes","shares","notes"].forEach(k=>{
+stats[k]=document.getElementById(k).value;
+});
+localStorage.setItem("bloomStats",JSON.stringify(stats));
+document.getElementById("saved").textContent="♡ Estadísticas guardadas";
+update();
+}
+
+function backup(){
+let data=JSON.stringify({done,stats},null,2);
+let a=document.createElement("a");
+a.href=URL.createObjectURL(new Blob([data],{type:"application/json"}));
+a.download="bloom-respaldo.json";
+a.click();
+setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+
+Object.keys(stats).forEach(k=>{
+document.getElementById(k).value=stats[k];
+});
+render();
+update();
+</script>
+</body>
+</html>
