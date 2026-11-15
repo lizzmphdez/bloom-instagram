@@ -236,5 +236,120 @@ document.getElementById(k).value=stats[k];
 render();
 update();
 </script>
+  
+<style>
+.daily-step{
+ display:flex;align-items:flex-start;gap:12px;
+ padding:14px 0;border-bottom:1px solid #efdce3
+}
+.daily-step input{
+ width:22px;height:22px;accent-color:#d58ca3;
+ flex-shrink:0
+}
+.daily-step strong{display:block;margin-bottom:5px}
+.daily-step small{color:#806775;line-height:1.5}
+.daily-date{
+ width:100%;padding:12px;border:1px solid #efdce3;
+ border-radius:12px;background:white;font:inherit
+}
+</style>
+
+<script>
+(function(){
+const area=document.createElement("div");
+area.className="card";
+area.innerHTML=`
+<h2>Mi rutina diaria 🌷</h2>
+<p class="small">Selecciona un día para ver todos tus pasos.</p>
+<select id="bloomDay" class="daily-date"></select>
+<div id="bloomDailyTasks"></div>
+<p id="bloomDailyProgress" class="small"></p>
+`;
+document.getElementById("inicio").appendChild(area);
+
+const selector=document.getElementById("bloomDay");
+plan.forEach((p,i)=>{
+ const opt=document.createElement("option");
+ opt.value=i;
+ opt.textContent=p[0]+" · "+p[3];
+ selector.appendChild(opt);
+});
+
+let saved={};
+try{
+ saved=JSON.parse(localStorage.getItem("bloomDaily")||"{}");
+}catch(e){}
+
+function showDaily(){
+ const i=Number(selector.value);
+ const p=plan[i];
+ const steps=[
+ ["Preparar contenido",
+ "Revisa el material que vas a publicar: "+p[3]+
+ ". Elige tus mejores fotos o clips."],
+ ["Publicar a la hora indicada",
+ p[1]+" · "+p[4]],
+ ["Preparar caption",
+ "Escribe una descripción breve y natural. "+
+ "Incluye una pregunta cuando tenga sentido."],
+ ["Añadir hashtags",
+ "Usa entre 3 y 5 hashtags relevantes "+
+ "para el contenido y tu audiencia."],
+ ["Compartir en Stories",
+ "Comparte tu publicación con un mensaje "+
+ "personal o una encuesta relacionada."],
+ ["Interactuar con tu comunidad",
+ "Responde comentarios y participa "+
+ "en conversaciones auténticas."],
+ ["Revisar resultados",
+ "Registra vistas, likes, compartidos "+
+ "y seguidores nuevos después de 24 horas."]
+ ];
+
+ const container=document.getElementById("bloomDailyTasks");
+ container.innerHTML="";
+ steps.forEach((s,j)=>{
+ const key=i+"-"+j;
+ const row=document.createElement("label");
+ row.className="daily-step";
+ const check=document.createElement("input");
+ check.type="checkbox";
+ check.checked=!!saved[key];
+ const info=document.createElement("div");
+ const title=document.createElement("strong");
+ title.textContent=s[0];
+ const detail=document.createElement("small");
+ detail.textContent=s[1];
+ info.append(title,detail);
+ row.append(check,info);
+ check.addEventListener("change",()=>{
+ saved[key]=check.checked;
+ localStorage.setItem("bloomDaily",JSON.stringify(saved));
+ countDaily(steps.length,i);
+ });
+ container.appendChild(row);
+ });
+ countDaily(steps.length,i);
+}
+
+function countDaily(total,i){
+ let n=0;
+ for(let j=0;j<total;j++){
+ if(saved[i+"-"+j])n++;
+ }
+ document.getElementById("bloomDailyProgress")
+ .textContent=n+" de "+total+" pasos completados ♡";
+}
+
+const today=Math.floor(
+ (new Date().setHours(12,0,0,0)-
+ new Date(2026,10,15,12).getTime())/86400000
+);
+selector.value=Math.max(0,Math.min(29,today));
+selector.addEventListener("change",showDaily);
+showDaily();
+})();
+</script>
+
 </body>
 </html>
