@@ -222,7 +222,8 @@ update();
 }
 
 function backup(){
-let data=JSON.stringify({done,stats},null,2);
+let daily=JSON.parse(localStorage.getItem("bloomDaily")||"{}");
+let data=JSON.stringify({done,stats,daily},null,2);
 let a=document.createElement("a");
 a.href=URL.createObjectURL(new Blob([data],{type:"application/json"}));
 a.download="bloom-respaldo.json";
