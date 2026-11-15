@@ -1,0 +1,17 @@
+{
+  "name": "Bloom ♡ · Mi planificador",
+  "short_name": "Bloom ♡",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fff8fa",
+  "theme_color": "#bc708e",
+  "icons": [
+    {
+      "src": "Blooming%20Pink%20B%20App%20Icon.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
